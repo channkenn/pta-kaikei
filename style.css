@@ -1,0 +1,143 @@
+/* --- 共通設定 --- */
+:root {
+  --primary-color: #4a90e2;
+  --save-color: #4caf50;
+  --print-color: #f39c12;
+  --bg-color: #f5f7fa;
+}
+
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans", Meiryo, sans-serif;
+  background-color: var(--bg-color);
+  color: #333;
+  line-height: 1.6;
+}
+
+/* --- スマホ向けレイアウト --- */
+.screen {
+  padding: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+/* --- 入力要素をスマホサイズに --- */
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* はみ出し防止 */
+}
+
+/* --- ボタンデザイン --- */
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+.btn-save {
+  background-color: var(--save-color);
+  color: white;
+}
+.btn-print {
+  background-color: var(--print-color);
+  color: white;
+}
+
+/* --- タブメニュー --- */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.tabs button {
+  flex: 1;
+  margin-top: 0;
+  padding: 10px;
+  font-size: 0.9rem;
+  background: #e0e0e0;
+}
+.tabs button.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* --- 印刷用設定 (A4 PDF) --- */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: white;
+    padding: 0;
+  }
+
+  .print-title {
+    text-align: center;
+    font-size: 20pt;
+    margin-bottom: 20mm;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10mm;
+  }
+
+  th,
+  td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    font-size: 11pt;
+  }
+
+  th {
+    background-color: #eee;
+  }
+}
