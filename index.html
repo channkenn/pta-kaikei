@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>PTA会計アプリ</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="login-screen" class="screen">
+      <div class="card">
+        <h1>PTA会計管理</h1>
+        <p>年度を選択して合言葉を入力してください</p>
+
+        <label>対象年度</label>
+        <select id="select-year">
+          <option value="2024">2024年度</option>
+          <option value="2025" selected>2025年度</option>
+          <option value="2026">2026年度</option>
+        </select>
+
+        <label>合言葉</label>
+        <input type="password" id="passcode" placeholder="合言葉を入力" />
+
+        <button onclick="app.login()" class="btn-primary">利用開始</button>
+      </div>
+    </div>
+
+    <div id="main-screen" class="screen no-print" style="display: none">
+      <div class="tabs">
+        <button onclick="app.switchTab('input')" id="tab-input" class="active">
+          書き込み
+        </button>
+        <button onclick="app.switchTab('view')" id="tab-view">
+          閲覧・出力
+        </button>
+      </div>
+
+      <div id="content-input">
+        <div class="card">
+          <h2 id="display-year"></h2>
+          <div id="edit-mode-badge" style="display: none; color: red">
+            【修正モード】
+          </div>
+
+          <label>日付</label>
+          <input type="date" id="input-date" />
+
+          <label>項目</label>
+          <input type="text" id="input-item" placeholder="例：お菓子代" />
+
+          <label>金額</label>
+          <input type="number" id="input-amount" placeholder="0" />
+
+          <button id="btn-save" onclick="app.saveData()" class="btn-save">
+            保存する
+          </button>
+          <button
+            id="btn-cancel"
+            onclick="app.resetForm()"
+            style="display: none"
+          >
+            キャンセル
+          </button>
+        </div>
+      </div>
+
+      <div id="content-view" style="display: none">
+        <div class="card">
+          <button onclick="window.print()" class="btn-print">
+            A4 PDFを出力する
+          </button>
+          <p class="hint">※スマホの「プリント」機能を使ってPDF保存できます</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="print-area" class="print-only">
+      <h1 class="print-title">
+        <span id="print-year-label"></span>年度 PTA収支報告書
+      </h1>
+      <table id="report-table">
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>項目</th>
+            <th>金額</th>
+          </tr>
+        </thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
