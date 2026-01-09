@@ -1,5 +1,3 @@
-// --- 設定エリア ---
-// あなたが発行したGASのWebアプリURLをここに貼り付けてください
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbzT6TAja9-u1ShiuioVlvxLZSoQxMUCpSR5tTSHDfnDCnjHqhmc7VWZbdojP7b3uFJIMw/exec";
 
@@ -7,45 +5,28 @@ const app = {
   userPass: "",
   selectedYear: "",
   records: [],
+  editable: false,
 
-  // 1. ログイン処理
   async login() {
     this.userPass = document.getElementById("passcode").value;
     this.selectedYear = document.getElementById("select-year").value;
-
     if (!this.userPass) return alert("合言葉を入力してください");
 
-    // GASからデータを取得してみる（認証を兼ねる）
     const result = await this.fetchFromGAS({ action: "read" });
+    if (result.error) return alert(result.error);
 
-    if (result.error) {
-      alert(result.error);
-    } else {
-      this.records = result.data;
-      document.getElementById("login-screen").style.display = "none";
-      document.getElementById("main-screen").style.display = "block";
-      document.getElementById("display-year").innerText =
-        this.selectedYear + "年度 収支入力";
-      document.getElementById("print-year-label").innerText = this.selectedYear;
-
-      // 書き込み権限がない場合は保存ボタンを消す
-      if (!result.editable) {
-        document.getElementById("btn-save").style.display = "none";
-        document.getElementById("edit-mode-badge").innerText =
-          "【閲覧専用モード】";
-        document.getElementById("edit-mode-badge").style.display = "block";
-      }
-
-      this.renderTable();
-    }
+    this.records = result.data; // [行番号, 日付, 項目, 内訳, 金額, 支払先, 備考]
+    this.editable = result.editable;
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("main-screen").style.display = "block";
+    document.getElementById("display-year").innerText =
+      this.selectedYear + "年度 収支入力";
+    this.renderTable();
   },
 
-  // 2. GASとの通信
   async fetchFromGAS(body) {
-    // 合言葉と年度を常に付与
     body.passcode = this.userPass;
     body.year = this.selectedYear;
-
     try {
       const response = await fetch(GAS_URL, {
         method: "POST",
@@ -53,52 +34,91 @@ const app = {
       });
       return await response.json();
     } catch (e) {
-      console.error(e);
       return { error: "通信に失敗しました" };
     }
   },
 
-  // 3. データ保存
   async saveData() {
     const item = document.getElementById("input-item").value;
-    const amount = document.getElementById("input-amount").value;
-    const date = document.getElementById("input-date").value;
+    let amount = parseFloat(document.getElementById("input-amount").value);
+    if (!item || isNaN(amount)) return alert("項目と金額は必須です");
 
-    if (!item || !amount) return alert("入力してください");
+    const expenseItems = [
+      "備品・消耗品費",
+      "お楽しみ会",
+      "予備費",
+      "卒園・進級記念品",
+      "通信・交通費",
+    ];
+    amount = expenseItems.includes(item) ? -Math.abs(amount) : Math.abs(amount);
 
     const result = await this.fetchFromGAS({
       action: "write",
+      date: document.getElementById("input-date").value,
       item: item,
+      details: document.getElementById("input-details").value,
       amount: amount,
-      date: date,
+      payee: document.getElementById("input-payee").value,
+      memo: document.getElementById("input-memo").value,
     });
-
     if (result.success) {
       alert("保存しました");
       this.resetForm();
-      this.login(); // データを再読み込み
-    } else {
-      alert(result.error);
+      this.login();
     }
   },
 
-  // 4. 閲覧用テーブルの描画
-  renderTable() {
-    const tbody = document.getElementById("report-body");
-    tbody.innerHTML = this.records
-      .map(
-        (row) => `
-            <tr>
-                <td>${new Date(row[0]).toLocaleDateString()}</td>
-                <td>${row[1]}</td>
-                <td>${Number(row[2]).toLocaleString()}円</td>
-            </tr>
-        `
-      )
-      .join("");
+  async deleteRecord(rowNum) {
+    if (!confirm("この行を削除してもよろしいですか？")) return;
+    const result = await this.fetchFromGAS({
+      action: "delete",
+      rowNum: rowNum,
+    });
+    if (result.success) this.login();
   },
 
-  // 5. タブ切り替え
+  renderTable() {
+    const filter = document.getElementById("filter-item").value;
+    const viewBody = document.getElementById("view-body");
+    const printBody = document.getElementById("report-body");
+
+    const filtered = this.records.filter(
+      (r) => filter === "ALL" || r[2] === filter
+    );
+    let total = 0;
+
+    const html = filtered.map((r) => {
+      const amt = Number(r[4]);
+      total += amt;
+      const displayAmt = Math.abs(amt).toLocaleString();
+
+      const commonCols = `
+            <td>${new Date(r[1]).toLocaleDateString("ja-JP", {
+              month: "numeric",
+              day: "numeric",
+            })}</td>
+            <td>${r[2]}</td>
+            <td>${r[3]}</td>
+            <td style="text-align:right">${displayAmt}</td>
+            <td>${r[5] || ""}</td>
+            <td>${r[6] || ""}</td>
+        `;
+
+      return {
+        print: `<tr>${commonCols}</tr>`,
+        view: `<tr>${commonCols}<td><button onclick="app.deleteRecord(${r[0]})" class="btn-delete">削</button></td></tr>`,
+      };
+    });
+
+    viewBody.innerHTML = html.map((h) => h.view).join("");
+    printBody.innerHTML = html.map((h) => h.print).join("");
+
+    document.getElementById("print-title-item").innerText =
+      filter === "ALL" ? "全項目" : filter;
+    document.getElementById("print-total").innerText =
+      Math.abs(total).toLocaleString() + "円";
+  },
+
   switchTab(tab) {
     document.getElementById("content-input").style.display =
       tab === "input" ? "block" : "none";
@@ -110,10 +130,38 @@ const app = {
     document
       .getElementById("tab-view")
       .classList.toggle("active", tab === "view");
+    if (tab === "view") this.renderTable();
   },
 
   resetForm() {
-    document.getElementById("input-item").value = "";
-    document.getElementById("input-amount").value = "";
+    [
+      "input-item",
+      "input-details",
+      "input-amount",
+      "input-payee",
+      "input-memo",
+    ].forEach((id) => {
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("input-date").value = new Date()
+      .toISOString()
+      .split("T")[0];
+  },
+
+  // ★追加：印刷用関数（ファイル名設定機能付き）
+  printReport() {
+    const filterSelect = document.getElementById("filter-item");
+    const itemName = filterSelect.options[filterSelect.selectedIndex].text;
+    const originalTitle = document.title;
+
+    // PDFのファイル名になるタイトルを変更
+    document.title = itemName;
+
+    window.print();
+
+    // 印刷後にタイトルを元に戻す
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
   },
 };

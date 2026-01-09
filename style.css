@@ -1,45 +1,28 @@
-/* --- 共通設定 --- */
-:root {
-  --primary-color: #4a90e2;
-  --save-color: #4caf50;
-  --print-color: #f39c12;
-  --bg-color: #f5f7fa;
-}
-
+/* --- 通常時（ブラウザ表示）の設定 --- */
 body {
+  font-family: sans-serif;
+  background: #f4f7f6;
   margin: 0;
-  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans", Meiryo, sans-serif;
-  background-color: var(--bg-color);
-  color: #333;
-  line-height: 1.6;
-}
-
-/* --- スマホ向けレイアウト --- */
-.screen {
-  padding: 15px;
-  max-width: 500px;
-  margin: 0 auto;
+  padding: 10px;
 }
 
 .card {
   background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
 }
 
-h1 {
-  font-size: 1.5rem;
-  text-align: center;
-  color: var(--primary-color);
+/* ★スマホ画面で表を横スクロールさせるための枠 */
+.scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* --- 入力要素をスマホサイズに --- */
 label {
   display: block;
-  margin-top: 15px;
+  margin-top: 10px;
   font-weight: bold;
   font-size: 0.9rem;
 }
@@ -47,97 +30,165 @@ label {
 input,
 select {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin-top: 5px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box; /* はみ出し防止 */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
-/* --- ボタンデザイン --- */
-button {
+.btn-save,
+.btn-primary,
+.btn-print {
   width: 100%;
   padding: 15px;
-  margin-top: 20px;
+  background: #4caf50;
+  color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: bold;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-top: 20px;
   cursor: pointer;
-  transition: opacity 0.2s;
 }
 
-.btn-primary {
-  background-color: var(--primary-color);
+.btn-delete {
+  background: #ff4d4d;
   color: white;
-}
-.btn-save {
-  background-color: var(--save-color);
-  color: white;
-}
-.btn-print {
-  background-color: var(--print-color);
-  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
 }
 
-/* --- タブメニュー --- */
+/* タブ */
 .tabs {
   display: flex;
-  gap: 10px;
   margin-bottom: 15px;
 }
+
 .tabs button {
   flex: 1;
-  margin-top: 0;
   padding: 10px;
-  font-size: 0.9rem;
-  background: #e0e0e0;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
 }
+
 .tabs button.active {
-  background: var(--primary-color);
+  background: #4caf50;
   color: white;
 }
 
-/* --- 印刷用設定 (A4 PDF) --- */
+/* --- 閲覧用テーブル（スマホ表示用：6列対応） --- */
+.view-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px; /* ★6列を並べるために必要な幅を確保 */
+}
+
+.view-table th,
+.view-table td {
+  padding: 8px 4px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 0.8rem;
+  white-space: nowrap; /* スマホ画面では勝手に改行させない */
+}
+
+/* 金額列は右寄せで見やすく */
+.view-table td:nth-child(4) {
+  text-align: right;
+  font-weight: bold;
+}
+
+/* 印刷専用エリア（普段は隠す） */
 .print-only {
   display: none;
 }
 
+/* --- 印刷設定（PDF出力時のみ適用） --- */
 @media print {
-  .no-print {
+  .no-print,
+  .tabs,
+  .card,
+  button,
+  label,
+  input,
+  select,
+  #login-screen {
     display: none !important;
   }
+
   .print-only {
     display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   body {
     background: white;
+    margin: 0;
     padding: 0;
   }
 
-  .print-title {
-    text-align: center;
-    font-size: 20pt;
-    margin-bottom: 20mm;
-  }
-
-  table {
+  table#report-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10mm;
+    margin-top: 20px;
+    table-layout: fixed;
   }
 
-  th,
-  td {
-    border: 1px solid black;
-    padding: 8px;
-    text-align: left;
-    font-size: 11pt;
+  table#report-table th,
+  table#report-table td {
+    border: 1px solid black !important;
+    padding: 6px 2px !important;
+    text-align: center;
+    font-size: 0.75rem !important;
+    word-break: break-all;
   }
 
-  th {
-    background-color: #eee;
+  /* 印刷時の列幅固定（日付・項目・内訳・金額・支払先・備考） */
+  table#report-table th:nth-child(1) {
+    width: 12%;
+  }
+  table#report-table th:nth-child(2) {
+    width: 15%;
+  }
+  table#report-table th:nth-child(3) {
+    width: 25%;
+  }
+  table#report-table th:nth-child(4) {
+    width: 12%;
+  }
+  table#report-table th:nth-child(5) {
+    width: 18%;
+  }
+  table#report-table th:nth-child(6) {
+    width: 18%;
+  }
+
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    border-bottom: 2px solid black;
+    padding-bottom: 5px;
+  }
+
+  .receipt-box {
+    margin-top: 30px;
+    border: 2px dashed #333 !important;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 1.4rem;
+    font-weight: bold;
+    page-break-inside: avoid;
   }
 }
