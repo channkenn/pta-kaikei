@@ -15,7 +15,7 @@ const app = {
     const result = await this.fetchFromGAS({ action: "read" });
     if (result.error) return alert(result.error);
 
-    this.records = result.data; // [行番号, 日付, 項目, 内訳, 金額, 支払先, 備考]
+    this.records = result.data;
     this.editable = result.editable;
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("main-screen").style.display = "block";
@@ -40,17 +40,14 @@ const app = {
 
   async saveData() {
     const item = document.getElementById("input-item").value;
-    let amount = parseFloat(document.getElementById("input-amount").value);
+    // 数値として取得。念のため絶対値(Math.abs)にしてプラスに固定します
+    let amount = Math.abs(
+      parseFloat(document.getElementById("input-amount").value)
+    );
+
     if (!item || isNaN(amount)) return alert("項目と金額は必須です");
 
-    const expenseItems = [
-      "備品・消耗品費",
-      "お楽しみ会",
-      "予備費",
-      "卒園・進級記念品",
-      "通信・交通費",
-    ];
-    amount = expenseItems.includes(item) ? -Math.abs(amount) : Math.abs(amount);
+    // ★マイナス判定のリスト(expenseItems)と変換処理を削除しました
 
     const result = await this.fetchFromGAS({
       action: "write",
@@ -88,9 +85,10 @@ const app = {
     let total = 0;
 
     const html = filtered.map((r) => {
+      // シートにプラスで保存されているので、そのまま足します
       const amt = Number(r[4]);
       total += amt;
-      const displayAmt = Math.abs(amt).toLocaleString();
+      const displayAmt = amt.toLocaleString();
 
       const commonCols = `
             <td>${new Date(r[1]).toLocaleDateString("ja-JP", {
@@ -113,10 +111,16 @@ const app = {
     viewBody.innerHTML = html.map((h) => h.view).join("");
     printBody.innerHTML = html.map((h) => h.print).join("");
 
+    const formattedTotal = total.toLocaleString();
+
     document.getElementById("print-title-item").innerText =
       filter === "ALL" ? "全項目" : filter;
-    document.getElementById("print-total").innerText =
-      Math.abs(total).toLocaleString() + "円";
+    document.getElementById("print-total").innerText = formattedTotal + "円";
+
+    const viewTotalElement = document.getElementById("view-total");
+    if (viewTotalElement) {
+      viewTotalElement.innerText = formattedTotal;
+    }
   },
 
   switchTab(tab) {
@@ -148,18 +152,12 @@ const app = {
       .split("T")[0];
   },
 
-  // ★追加：印刷用関数（ファイル名設定機能付き）
   printReport() {
     const filterSelect = document.getElementById("filter-item");
     const itemName = filterSelect.options[filterSelect.selectedIndex].text;
     const originalTitle = document.title;
-
-    // PDFのファイル名になるタイトルを変更
     document.title = itemName;
-
     window.print();
-
-    // 印刷後にタイトルを元に戻す
     setTimeout(() => {
       document.title = originalTitle;
     }, 1000);

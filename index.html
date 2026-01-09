@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>PTA会計アプリ 完全版</title>
+    <title>PTA会計アプリ</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -61,8 +61,12 @@
                 <option value="卒園進級記念品代">卒園進級記念品代</option>
                 <option value="学年末お礼代">学年末お礼代</option>
                 <option value="クラス担任アルバム">クラス担任アルバム</option>
-                <option value="札幌私立幼稚園PTA連合会会費">札幌私立幼稚園PTA連合会会費</option>
-                <option value="日本スポーツ振興センター負担金">日本スポーツ振興センター負担金</option>
+                <option value="札幌私立幼稚園PTA連合会会費">
+                  札幌私立幼稚園PTA連合会会費
+                </option>
+                <option value="日本スポーツ振興センター負担金">
+                  日本スポーツ振興センター負担金
+                </option>
                 <option value="幼稚園寄付金">幼稚園寄付金</option>
                 <option value="用紙・印刷代">用紙・印刷代</option>
                 <option value="通信費">通信費</option>
@@ -108,36 +112,56 @@
               <option value="卒園進級記念品代">卒園進級記念品代</option>
               <option value="学年末お礼代">学年末お礼代</option>
               <option value="クラス担任アルバム">クラス担任アルバム</option>
-              <option value="札幌私立幼稚園PTA連合会会費">札幌私立幼稚園PTA連合会会費</option>
-              <option value="日本スポーツ振興センター負担金">日本スポーツ振興センター負担金</option>
+              <option value="札幌私立幼稚園PTA連合会会費">
+                札幌私立幼稚園PTA連合会会費
+              </option>
+              <option value="日本スポーツ振興センター負担金">
+                日本スポーツ振興センター負担金
+              </option>
               <option value="幼稚園寄付金">幼稚園寄付金</option>
               <option value="用紙・印刷代">用紙・印刷代</option>
               <option value="通信費">通信費</option>
-
             </select>
+
+            <div
+              style="
+                margin-top: 15px;
+                font-weight: bold;
+                text-align: right;
+                color: #2e7d32;
+                font-size: 1.1rem;
+              "
+            >
+              選択中の合計: <span id="view-total">0</span>円
+            </div>
           </div>
-          <div class="card" style="overflow-x: auto">
-            <table class="view-table">
-              <thead>
-                <tr>
-                  <th>日付</th>
-                  <th>項目</th>
-                  <th>内訳</th>
-                  <th>金額</th>
-                  <th>支払先</th>
-                  <th>備考</th>
-                  <th>消</th>
-                </tr>
-              </thead>
-              <tbody id="view-body"></tbody>
-            </table>
+
+          <div class="card no-print">
+            <div class="scroll-container">
+              <table class="view-table">
+                <thead>
+                  <tr>
+                    <th>日付</th>
+                    <th>項目</th>
+                    <th>内訳</th>
+                    <th>金額</th>
+                    <th>支払先</th>
+                    <th>備考</th>
+                    <th>消</th>
+                  </tr>
+                </thead>
+                <tbody id="view-body"></tbody>
+              </table>
+            </div>
           </div>
-          <button onclick="app.printReport()" class="btn-print">A4帳票(PDF)を出力</button>
+
+          <button onclick="app.printReport()" class="btn-print">
             A4帳票(PDF)を出力
           </button>
         </div>
       </div>
     </div>
+
     <div id="print-area" class="print-only">
       <div class="print-header">
         <div>【明細】：<span id="print-title-item"></span></div>
