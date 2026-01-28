@@ -72,7 +72,7 @@ const app = {
 
   renderTable() {
     const filter = document.getElementById("filter-item").value;
-    const sortOrder = document.getElementById("sort-order").value; // ★追加：ソート順の取得
+    const sortOrder = document.getElementById("sort-order").value;
     const viewBody = document.getElementById("view-body");
     const printBody = document.getElementById("report-body");
 
@@ -81,18 +81,13 @@ const app = {
       (r) => filter === "ALL" || r[2] === filter,
     );
 
-    // 2. ★追加：日付順ソート
+    // 2. 日付ソート
     filtered.sort((a, b) => {
       const dateA = new Date(a[1]);
       const dateB = new Date(b[1]);
-      // 新しい順(desc)なら B - A, 古い順(asc)なら A - B
       return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
     });
 
-    let incomeTotal = 0;
-    let expenseTotal = 0;
-
-    // 収入とみなす項目リスト
     const incomeItems = [
       "前年度繰越金",
       "本年度会費",
@@ -103,52 +98,78 @@ const app = {
     const html = filtered.map((r) => {
       const itemName = r[2];
       const amt = Number(r[4]);
+      const isIncome = incomeItems.includes(itemName);
+      const amtColor = isIncome ? "color: #0000ff;" : "color: #d32f2f;";
 
-      // 収入か支出かを判定して加算
-      if (incomeItems.includes(itemName)) {
-        incomeTotal += amt;
-      } else {
-        expenseTotal += amt;
-      }
-
-      const displayAmt = amt.toLocaleString();
-      // ★収入項目の場合だけ青色にするスタイルを定義
-      const amtColor = incomeItems.includes(itemName) ? "color: #0000ff;" : "";
+      // チェックボックス (金額と収入フラグを保持)
+      const checkbox = `<input type="checkbox" class="row-checkbox" checked 
+                          data-amount="${amt}" 
+                          data-income="${isIncome}" 
+                          onchange="app.recalculateSelected()">`;
 
       const commonCols = `
-      <td>${new Date(r[1]).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })}</td>
-      <td>${itemName}</td>
-      <td>${r[3]}</td>
-      <td style="text-align:right; ${amtColor}">${displayAmt}</td>
-      <td>${r[5] || ""}</td>
-      <td>${r[6] || ""}</td>
-  `;
+            <td>${new Date(r[1]).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })}</td>
+            <td>${itemName}</td>
+            <td>${r[3]}</td>
+            <td style="text-align:right; font-weight:bold; ${amtColor}">${amt.toLocaleString()}</td>
+            <td>${r[5] || ""}</td>
+            <td>${r[6] || ""}</td>
+        `;
 
       return {
         print: `<tr>${commonCols}</tr>`,
-        view: `<tr>${commonCols}<td><button onclick="app.deleteRecord(${r[0]})" class="btn-delete">削</button></td></tr>`,
+        view: `<tr><td>${checkbox}</td>${commonCols}<td><button onclick="app.deleteRecord(${r[0]})" class="btn-delete">削</button></td></tr>`,
       };
     });
 
     viewBody.innerHTML = html.map((h) => h.view).join("");
     printBody.innerHTML = html.map((h) => h.print).join("");
 
-    // 各合計と残高の計算
-    const balance = incomeTotal - expenseTotal;
-
-    // 画面表示更新
-    document.getElementById("view-total-income").innerText =
-      incomeTotal.toLocaleString();
-    document.getElementById("view-total-expense").innerText =
-      expenseTotal.toLocaleString();
-    document.getElementById("view-total-balance").innerText =
-      balance.toLocaleString();
-
-    // 帳票用（印刷用）のテキスト
+    // 集計実行
+    this.recalculateSelected();
     document.getElementById("print-title-item").innerText =
       filter === "ALL" ? "全項目" : filter;
-    document.getElementById("print-total").innerText =
-      `収入: ${incomeTotal.toLocaleString()}円 / 支出: ${expenseTotal.toLocaleString()}円 (残高: ${balance.toLocaleString()}円)`;
+  },
+
+  // ★チェックされた行だけで合計を出す
+  recalculateSelected() {
+    let incomeTotal = 0;
+    let expenseTotal = 0;
+
+    const checkboxes = document.querySelectorAll(".row-checkbox");
+    checkboxes.forEach((cb) => {
+      if (cb.checked) {
+        const amt = parseFloat(cb.dataset.amount);
+        const isIncome = cb.dataset.income === "true";
+        if (isIncome) {
+          incomeTotal += amt;
+        } else {
+          expenseTotal += amt;
+        }
+      }
+    });
+
+    const balance = incomeTotal - expenseTotal;
+
+    const incomeEl = document.getElementById("view-total-income");
+    const expenseEl = document.getElementById("view-total-expense");
+    const balanceEl = document.getElementById("view-total-balance");
+
+    if (incomeEl) {
+      incomeEl.innerText = incomeTotal.toLocaleString();
+      incomeEl.parentElement.style.color = "#0000ff"; // 収入は青
+    }
+    if (expenseEl) {
+      expenseEl.innerText = expenseTotal.toLocaleString();
+      expenseEl.parentElement.style.color = "#d32f2f"; // 支出は赤
+    }
+    if (balanceEl) balanceEl.innerText = balance.toLocaleString();
+
+    // 帳票合計ラベル
+    const printTotal = document.getElementById("print-total");
+    if (printTotal) {
+      printTotal.innerText = `選択計 収入: ${incomeTotal.toLocaleString()}円 / 支出: ${expenseTotal.toLocaleString()}円 (残高: ${balance.toLocaleString()}円)`;
+    }
   },
 
   switchTab(tab) {
