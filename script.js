@@ -40,14 +40,10 @@ const app = {
 
   async saveData() {
     const item = document.getElementById("input-item").value;
-    // 数値として取得。念のため絶対値(Math.abs)にしてプラスに固定します
     let amount = Math.abs(
-      parseFloat(document.getElementById("input-amount").value)
+      parseFloat(document.getElementById("input-amount").value),
     );
-
     if (!item || isNaN(amount)) return alert("項目と金額は必須です");
-
-    // ★マイナス判定のリスト(expenseItems)と変換処理を削除しました
 
     const result = await this.fetchFromGAS({
       action: "write",
@@ -80,22 +76,35 @@ const app = {
     const printBody = document.getElementById("report-body");
 
     const filtered = this.records.filter(
-      (r) => filter === "ALL" || r[2] === filter
+      (r) => filter === "ALL" || r[2] === filter,
     );
-    let total = 0;
+
+    let incomeTotal = 0;
+    let expenseTotal = 0;
+
+    // 収入とみなす項目リスト
+    const incomeItems = [
+      "前年度繰越金",
+      "本年度会費",
+      "資源回収収益",
+      "決算利息",
+    ];
 
     const html = filtered.map((r) => {
-      // シートにプラスで保存されているので、そのまま足します
+      const itemName = r[2];
       const amt = Number(r[4]);
-      total += amt;
-      const displayAmt = amt.toLocaleString();
 
+      // 収入か支出かを判定して加算
+      if (incomeItems.includes(itemName)) {
+        incomeTotal += amt;
+      } else {
+        expenseTotal += amt;
+      }
+
+      const displayAmt = amt.toLocaleString();
       const commonCols = `
-            <td>${new Date(r[1]).toLocaleDateString("ja-JP", {
-              month: "numeric",
-              day: "numeric",
-            })}</td>
-            <td>${r[2]}</td>
+            <td>${new Date(r[1]).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })}</td>
+            <td>${itemName}</td>
             <td>${r[3]}</td>
             <td style="text-align:right">${displayAmt}</td>
             <td>${r[5] || ""}</td>
@@ -111,16 +120,22 @@ const app = {
     viewBody.innerHTML = html.map((h) => h.view).join("");
     printBody.innerHTML = html.map((h) => h.print).join("");
 
-    const formattedTotal = total.toLocaleString();
+    // 各合計と残高の計算
+    const balance = incomeTotal - expenseTotal;
 
+    // 画面表示更新
+    document.getElementById("view-total-income").innerText =
+      incomeTotal.toLocaleString();
+    document.getElementById("view-total-expense").innerText =
+      expenseTotal.toLocaleString();
+    document.getElementById("view-total-balance").innerText =
+      balance.toLocaleString();
+
+    // 帳票用（印刷用）のテキスト
     document.getElementById("print-title-item").innerText =
       filter === "ALL" ? "全項目" : filter;
-    document.getElementById("print-total").innerText = formattedTotal + "円";
-
-    const viewTotalElement = document.getElementById("view-total");
-    if (viewTotalElement) {
-      viewTotalElement.innerText = formattedTotal;
-    }
+    document.getElementById("print-total").innerText =
+      `収入: ${incomeTotal.toLocaleString()}円 / 支出: ${expenseTotal.toLocaleString()}円 (残高: ${balance.toLocaleString()}円)`;
   },
 
   switchTab(tab) {

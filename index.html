@@ -8,6 +8,7 @@
     />
     <title>PTA会計アプリ</title>
     <link rel="stylesheet" href="style.css" />
+
     <meta property="og:title" content="さわらび幼稚園PTA会計管理アプリ" />
     <meta
       property="og:description"
@@ -108,7 +109,6 @@
             />
             <label>備考（予備）</label>
             <input type="text" id="input-memo" />
-
             <button id="btn-save" onclick="app.saveData()" class="btn-save">
               保存する
             </button>
@@ -128,7 +128,6 @@
               <option value="学年末お礼代">学年末お礼代</option>
               <option value="クラス担任アルバム">クラス担任アルバム</option>
               <option value="慶弔費">慶弔費</option>
-
               <option value="札幌私立幼稚園PTA連合会会費">
                 札幌私立幼稚園PTA連合会会費
               </option>
@@ -146,11 +145,21 @@
                 margin-top: 15px;
                 font-weight: bold;
                 text-align: right;
-                color: #2e7d32;
                 font-size: 1.1rem;
+                line-height: 1.6;
               "
             >
-              選択中の合計: <span id="view-total">0</span>円
+              <div style="color: #2e7d32">
+                収入合計: <span id="view-total-income">0</span>円
+              </div>
+              <div style="color: #d32f2f">
+                支出合計: <span id="view-total-expense">0</span>円
+              </div>
+              <div
+                style="border-top: 1px solid #ccc; margin-top: 5px; color: #333"
+              >
+                残高: <span id="view-total-balance">0</span>円
+              </div>
             </div>
           </div>
 
@@ -183,7 +192,7 @@
     <div id="print-area" class="print-only">
       <div class="print-header">
         <div>【明細】：<span id="print-title-item"></span></div>
-        <div>合計：<strong id="print-total"></strong></div>
+        <div><span id="print-total"></span></div>
       </div>
       <table id="report-table">
         <thead>
