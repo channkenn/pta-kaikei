@@ -12,7 +12,7 @@
     <meta property="og:title" content="さわらび幼稚園PTA会計管理アプリ" />
     <meta
       property="og:description"
-      content="PTAの収支入力・帳票出力がスマホで簡単に。2025-2030年度対応。"
+      content="PTA의 수입 입력・장표 출력이 스마트폰으로 간단하게. 2025-2030년도 대응."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://channkenn.github.io/pta-kaikei/" />
@@ -138,6 +138,14 @@
               <option value="用紙・印刷代">用紙・印刷代</option>
               <option value="通信費">通信費</option>
               <option value="予備費">予備費</option>
+            </select>
+
+            <label>日付の並び替え</label>
+            <select id="sort-order" onchange="app.renderTable()">
+              <option value="desc" selected>
+                新しい順（最近の入力を上に）
+              </option>
+              <option value="asc">古い順（日付順に並べる）</option>
             </select>
 
             <div

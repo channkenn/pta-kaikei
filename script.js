@@ -72,12 +72,22 @@ const app = {
 
   renderTable() {
     const filter = document.getElementById("filter-item").value;
+    const sortOrder = document.getElementById("sort-order").value; // ★追加：ソート順の取得
     const viewBody = document.getElementById("view-body");
     const printBody = document.getElementById("report-body");
 
-    const filtered = this.records.filter(
+    // 1. 絞り込み
+    let filtered = this.records.filter(
       (r) => filter === "ALL" || r[2] === filter,
     );
+
+    // 2. ★追加：日付順ソート
+    filtered.sort((a, b) => {
+      const dateA = new Date(a[1]);
+      const dateB = new Date(b[1]);
+      // 新しい順(desc)なら B - A, 古い順(asc)なら A - B
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
 
     let incomeTotal = 0;
     let expenseTotal = 0;
@@ -102,14 +112,17 @@ const app = {
       }
 
       const displayAmt = amt.toLocaleString();
+      // ★収入項目の場合だけ青色にするスタイルを定義
+      const amtColor = incomeItems.includes(itemName) ? "color: #0000ff;" : "";
+
       const commonCols = `
-            <td>${new Date(r[1]).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })}</td>
-            <td>${itemName}</td>
-            <td>${r[3]}</td>
-            <td style="text-align:right">${displayAmt}</td>
-            <td>${r[5] || ""}</td>
-            <td>${r[6] || ""}</td>
-        `;
+      <td>${new Date(r[1]).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })}</td>
+      <td>${itemName}</td>
+      <td>${r[3]}</td>
+      <td style="text-align:right; ${amtColor}">${displayAmt}</td>
+      <td>${r[5] || ""}</td>
+      <td>${r[6] || ""}</td>
+  `;
 
       return {
         print: `<tr>${commonCols}</tr>`,
