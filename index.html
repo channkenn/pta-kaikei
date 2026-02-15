@@ -35,7 +35,9 @@
           </select>
           <label>合言葉</label>
           <input type="password" id="passcode" placeholder="合言葉を入力" />
-          <button onclick="app.login()" class="btn-primary">利用開始</button>
+          <button onclick="app.handleLogin()" class="btn-primary">
+            利用開始
+          </button>
         </div>
       </div>
 
@@ -109,7 +111,11 @@
             />
             <label>備考（予備）</label>
             <input type="text" id="input-memo" />
-            <button id="btn-save" onclick="app.saveData()" class="btn-save">
+            <button
+              id="btn-save"
+              onclick="app.handleSaveNewRecord()"
+              class="btn-save"
+            >
               保存する
             </button>
           </div>
@@ -118,7 +124,7 @@
         <div id="content-view" style="display: none">
           <div class="card">
             <label>絞り込んで帳票を作る</label>
-            <select id="filter-item" onchange="app.renderTable()">
+            <select id="filter-item" onchange="app.renderAccountingTable()">
               <option value="ALL">すべての項目</option>
               <option value="備品・消耗品費">備品・消耗品費</option>
               <option value="お楽しみ会">お楽しみ会</option>
@@ -141,7 +147,7 @@
             </select>
 
             <label>日付の並び替え</label>
-            <select id="sort-order" onchange="app.renderTable()">
+            <select id="sort-order" onchange="app.renderAccountingTable()">
               <option value="desc" selected>
                 新しい順（最近の入力を上に）
               </option>
@@ -187,7 +193,7 @@
             </div>
           </div>
 
-          <button onclick="app.printReport()" class="btn-print">
+          <button onclick="app.handlePrintReport()" class="btn-print">
             A4帳票(PDF)を出力
           </button>
         </div>
