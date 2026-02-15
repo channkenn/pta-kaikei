@@ -126,24 +126,27 @@
             <label>絞り込んで帳票を作る</label>
             <select id="filter-item" onchange="app.renderAccountingTable()">
               <option value="ALL">すべての項目</option>
-              <option value="備品・消耗品費">備品・消耗品費</option>
-              <option value="お楽しみ会">お楽しみ会</option>
-              <option value="お泊り会おみやげ">お泊り会おみやげ</option>
-              <option value="運動会景品">運動会景品</option>
-              <option value="卒園進級記念品代">卒園進級記念品代</option>
-              <option value="学年末お礼代">学年末お礼代</option>
-              <option value="クラス担任アルバム">クラス担任アルバム</option>
-              <option value="慶弔費">慶弔費</option>
-              <option value="札幌私立幼稚園PTA連合会会費">
-                札幌私立幼稚園PTA連合会会費
-              </option>
-              <option value="日本スポーツ振興センター負担金">
-                日本スポーツ振興センター負担金
-              </option>
-              <option value="幼稚園寄付金">幼稚園寄付金</option>
-              <option value="用紙・印刷代">用紙・印刷代</option>
-              <option value="通信費">通信費</option>
-              <option value="予備費">予備費</option>
+              <option value="_EXPENSES_ONLY_">支出のすべて</option>
+              <optgroup label="支出項目（個別）">
+                <option value="備品・消耗品費">備品・消耗品費</option>
+                <option value="お楽しみ会">お楽しみ会</option>
+                <option value="お泊り会おみやげ">お泊り会おみやげ</option>
+                <option value="運動会景品">運動会景品</option>
+                <option value="卒園進級記念品代">卒園進級記念品代</option>
+                <option value="学年末お礼代">学年末お礼代</option>
+                <option value="クラス担任アルバム">クラス担任アルバム</option>
+                <option value="慶弔費">慶弔費</option>
+                <option value="札幌私立幼稚園PTA連合会会費">
+                  札幌私立幼稚園PTA連合会会費
+                </option>
+                <option value="日本スポーツ振興センター負担金">
+                  日本スポーツ振興センター負担金
+                </option>
+                <option value="幼稚園寄付金">幼稚園寄付金</option>
+                <option value="用紙・印刷代">用紙・印刷代</option>
+                <option value="通信費">通信費</option>
+                <option value="予備費">予備費</option>
+              </optgroup>
             </select>
 
             <label>日付の並び替え</label>

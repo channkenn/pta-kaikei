@@ -73,9 +73,19 @@ const dataProcessor = {
   },
 
   filterAndSortRecords(records, filterItem, sortOrder) {
-    const filteredRecords = records.filter(
-      (record) => filterItem === "ALL" || record[2] === filterItem,
-    );
+    // Why: フィルター条件を複数扱うため、if文で条件を分岐させています。
+    //      "ALL"は全件、"_EXPENSES_ONLY_"は支出のみ、それ以外は項目名での完全一致検索として機能します。
+    //      この特殊な識別子"_EXPENSES_ONLY_"は、UI上の表示とは独立した、ロジック内部でのみ意味を持つ値です。
+    const filteredRecords = records.filter((record) => {
+      const itemName = record[2];
+      if (filterItem === "ALL") {
+        return true;
+      }
+      if (filterItem === "_EXPENSES_ONLY_") {
+        return !this.isIncomeItem(itemName);
+      }
+      return itemName === filterItem;
+    });
 
     // Why: sortメソッドは元の配列を直接変更（破壊）してしまいます。
     //      予期せぬ副作用を防ぐため、スプレッド構文(...)を用いて配列のシャローコピーを作成し、そのコピーに対してソート処理を実行します。
@@ -200,7 +210,8 @@ const uiManager = {
   },
 
   renderAccountingTable() {
-    const filter = this.domElements.filterItem.value;
+    const filterSelect = this.domElements.filterItem;
+    const filter = filterSelect.value;
     const sortOrder = this.domElements.sortOrder.value;
 
     const processedRecords = dataProcessor.filterAndSortRecords(
@@ -219,7 +230,7 @@ const uiManager = {
     this.domElements.viewBody.innerHTML = viewRowsHtml;
     this.domElements.reportBody.innerHTML = printRowsHtml;
     this.domElements.printTitleItem.innerText =
-      filter === "ALL" ? "全項目" : filter;
+      filterSelect.options[filterSelect.selectedIndex].text;
 
     this.updateTotalsDisplay();
   },
@@ -228,13 +239,24 @@ const uiManager = {
     const checkboxes = document.querySelectorAll(".row-checkbox");
     const totals = dataProcessor.calculateTotalsFromSelection(checkboxes);
 
+    // 画面上の合計表示は常にすべて表示
     this.domElements.viewTotalIncome.innerText =
       totals.incomeTotal.toLocaleString();
     this.domElements.viewTotalExpense.innerText =
       totals.expenseTotal.toLocaleString();
     this.domElements.viewTotalBalance.innerText =
       totals.balance.toLocaleString();
-    this.domElements.printTotal.innerText = `選択計 収入: ${totals.incomeTotal.toLocaleString()}円 / 支出: ${totals.expenseTotal.toLocaleString()}円 (残高: ${totals.balance.toLocaleString()}円)`;
+
+    // 印刷用の合計表示はフィルター条件によって切り替える
+    const filterValue = this.domElements.filterItem.value;
+
+    // Why: フィルターが「すべての項目」の場合のみ収入・残高を含めた全情報を表示します。
+    //      それ以外（支出項目での絞り込み時）は、帳票の目的に合わせて支出の合計のみを記載し、情報を簡潔に保ちます。
+    if (filterValue === "ALL") {
+      this.domElements.printTotal.innerText = `計 収入: ${totals.incomeTotal.toLocaleString()}円 / 支出: ${totals.expenseTotal.toLocaleString()}円 (残高: ${totals.balance.toLocaleString()}円)`;
+    } else {
+      this.domElements.printTotal.innerText = `支出合計: ${totals.expenseTotal.toLocaleString()}円`;
+    }
   },
 
   switchTab(tabName) {
