@@ -39,16 +39,27 @@ select {
 
 .btn-save,
 .btn-primary,
-.btn-print {
+.btn-print,
+.btn-summary-print {
   width: 100%;
   padding: 15px;
-  background: #4caf50;
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
   margin-top: 20px;
   cursor: pointer;
+}
+
+.btn-save,
+.btn-primary,
+.btn-print {
+  background: #4caf50;
+}
+
+.btn-summary-print {
+  background: #2196f3; /* 決算報告書ボタンの色を変更 */
+  margin-top: 10px;
 }
 
 .btn-delete {
@@ -97,7 +108,8 @@ select {
 }
 
 /* 金額列は右寄せで見やすく */
-.view-table td:nth-child(4) {
+.view-table td:nth-child(5) {
+  /* 金額列は5番目に変更 */
   text-align: right;
   font-weight: bold;
 }
@@ -109,14 +121,7 @@ select {
 
 /* --- 印刷設定（PDF出力時のみ適用） --- */
 @media print {
-  .no-print,
-  .tabs,
-  .card,
-  button,
-  label,
-  input,
-  select,
-  #login-screen {
+  .no-print {
     display: none !important;
   }
 
@@ -127,12 +132,21 @@ select {
     padding: 0 !important;
   }
 
+  /* 印刷対象に応じて不要なエリアを隠す */
+  body.printing-details #summary-print-area {
+    display: none !important;
+  }
+  body.printing-summary #print-area {
+    display: none !important;
+  }
+
   body {
     background: white;
     margin: 0;
     padding: 0;
   }
 
+  /* --- 明細帳票のスタイル --- */
   table#report-table {
     width: 100%;
     border-collapse: collapse;
@@ -149,7 +163,6 @@ select {
     word-break: break-all;
   }
 
-  /* 印刷時の列幅固定（日付・項目・内訳・金額・支払先・備考） */
   table#report-table th:nth-child(1) {
     width: 12%;
   }
@@ -190,5 +203,43 @@ select {
     font-size: 1.4rem;
     font-weight: bold;
     page-break-inside: avoid;
+  }
+
+  /* --- 決算報告書用のスタイル --- */
+  #summary-print-area h2,
+  #summary-print-area h3 {
+    text-align: center;
+  }
+
+  #summary-print-area .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+  }
+
+  #summary-print-area .summary-table th,
+  #summary-print-area .summary-table td {
+    border: 1px solid black;
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  #summary-print-area .summary-table th {
+    background-color: #f2f2f2;
+  }
+
+  #summary-print-area .summary-table th:first-child,
+  #summary-print-area .summary-table td:first-child {
+    width: 70%;
+  }
+
+  #summary-print-area .summary-table td:last-child {
+    text-align: right;
+  }
+
+  #summary-print-area .summary-final-balance {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 1.1rem;
   }
 }

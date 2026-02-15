@@ -196,8 +196,14 @@
             </div>
           </div>
 
+          <button
+            onclick="app.handlePrintSummaryReport()"
+            class="btn-summary-print"
+          >
+            決算報告書を出力
+          </button>
           <button onclick="app.handlePrintReport()" class="btn-print">
-            A4帳票(PDF)を出力
+            A4明細帳票(PDF)を出力
           </button>
         </div>
       </div>
@@ -222,6 +228,48 @@
         <tbody id="report-body"></tbody>
       </table>
       <div class="receipt-box">領収証貼り付け</div>
+    </div>
+
+    <div id="summary-print-area" class="print-only">
+      <h2 id="summary-print-title"></h2>
+
+      <h3>《収入の部》</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>金額</th>
+          </tr>
+        </thead>
+        <tbody id="summary-income-body"></tbody>
+        <tfoot>
+          <tr>
+            <td><strong>合計</strong></td>
+            <td id="summary-total-income"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h3>《支出の部》</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>金額</th>
+          </tr>
+        </thead>
+        <tbody id="summary-expense-body"></tbody>
+        <tfoot>
+          <tr>
+            <td><strong>合計</strong></td>
+            <td id="summary-total-expense"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="summary-final-balance">
+        <h3>差引残高: <span id="summary-final-balance"></span>円</h3>
+      </div>
     </div>
 
     <script src="script.js"></script>

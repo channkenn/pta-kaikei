@@ -118,6 +118,50 @@ const dataProcessor = {
       balance: incomeTotal - expenseTotal,
     };
   },
+
+  calculateSummary(records) {
+    const summary = {
+      income: new Map(),
+      expense: new Map(),
+    };
+
+    records.forEach((record) => {
+      const [_row, _date, itemName, _details, amountStr] = record;
+      const amount = parseFloat(amountStr);
+
+      if (this.isIncomeItem(itemName)) {
+        const currentTotal = summary.income.get(itemName) || 0;
+        summary.income.set(itemName, currentTotal + amount);
+      } else {
+        const currentTotal = summary.expense.get(itemName) || 0;
+        summary.expense.set(itemName, currentTotal + amount);
+      }
+    });
+
+    let totalIncome = 0;
+    const incomeSummary = Array.from(summary.income.entries()).map(
+      ([itemName, totalAmount]) => {
+        totalIncome += totalAmount;
+        return { itemName, totalAmount };
+      },
+    );
+
+    let totalExpense = 0;
+    const expenseSummary = Array.from(summary.expense.entries()).map(
+      ([itemName, totalAmount]) => {
+        totalExpense += totalAmount;
+        return { itemName, totalAmount };
+      },
+    );
+
+    return {
+      incomeSummary,
+      expenseSummary,
+      totalIncome,
+      totalExpense,
+      finalBalance: totalIncome - totalExpense,
+    };
+  },
 };
 
 // --- UI操作 (View) ---
@@ -146,6 +190,12 @@ const uiManager = {
     contentView: document.getElementById("content-view"),
     tabInput: document.getElementById("tab-input"),
     tabView: document.getElementById("tab-view"),
+    summaryPrintTitle: document.getElementById("summary-print-title"),
+    summaryIncomeBody: document.getElementById("summary-income-body"),
+    summaryTotalIncome: document.getElementById("summary-total-income"),
+    summaryExpenseBody: document.getElementById("summary-expense-body"),
+    summaryTotalExpense: document.getElementById("summary-total-expense"),
+    summaryFinalBalance: document.getElementById("summary-final-balance"),
   },
 
   _createViewRowHtml(record) {
@@ -235,6 +285,26 @@ const uiManager = {
     this.updateTotalsDisplay();
   },
 
+  renderSummaryReport(summaryData) {
+    const createRow = (item) =>
+      `<tr><td>${item.itemName}</td><td>${item.totalAmount.toLocaleString()}</td></tr>`;
+
+    this.domElements.summaryIncomeBody.innerHTML = summaryData.incomeSummary
+      .map(createRow)
+      .join("");
+    this.domElements.summaryExpenseBody.innerHTML = summaryData.expenseSummary
+      .map(createRow)
+      .join("");
+
+    this.domElements.summaryTotalIncome.innerText =
+      summaryData.totalIncome.toLocaleString();
+    this.domElements.summaryTotalExpense.innerText =
+      summaryData.totalExpense.toLocaleString();
+    this.domElements.summaryFinalBalance.innerText =
+      summaryData.finalBalance.toLocaleString();
+    this.domElements.summaryPrintTitle.innerText = `${applicationState.selectedFiscalYear}年度 決算報告書`;
+  },
+
   updateTotalsDisplay() {
     const checkboxes = document.querySelectorAll(".row-checkbox");
     const totals = dataProcessor.calculateTotalsFromSelection(checkboxes);
@@ -253,9 +323,9 @@ const uiManager = {
     // Why: フィルターが「すべての項目」の場合のみ収入・残高を含めた全情報を表示します。
     //      それ以外（支出項目での絞り込み時）は、帳票の目的に合わせて支出の合計のみを記載し、情報を簡潔に保ちます。
     if (filterValue === "ALL") {
-      this.domElements.printTotal.innerText = `計 収入: ${totals.incomeTotal.toLocaleString()}円 / 支出: ${totals.expenseTotal.toLocaleString()}円 (残高: ${totals.balance.toLocaleString()}円)`;
+      this.domElements.printTotal.innerText = `選択計 収入: ${totals.incomeTotal.toLocaleString()}円 / 支出: ${totals.expenseTotal.toLocaleString()}円 (残高: ${totals.balance.toLocaleString()}円)`;
     } else {
-      this.domElements.printTotal.innerText = `支出合計: ${totals.expenseTotal.toLocaleString()}円`;
+      this.domElements.printTotal.innerText = `選択支出合計: ${totals.expenseTotal.toLocaleString()}円`;
     }
   },
 
@@ -357,11 +427,29 @@ const appController = {
     const itemName = filterSelect.options[filterSelect.selectedIndex].text;
     const originalTitle = document.title;
     document.title = `${applicationState.selectedFiscalYear}年度_${itemName}`;
+
+    document.body.classList.add("printing-details");
     window.print();
-    // Why: 印刷ダイアログは同期的には動作しません。そのため、少し待ってからタイトルを元に戻すことで、
-    //      ユーザーが保存するPDFのファイル名に意図したタイトルが適用される確率を高めます。
     setTimeout(() => {
       document.title = originalTitle;
+      document.body.classList.remove("printing-details");
+    }, 1000);
+  },
+
+  handlePrintSummaryReport() {
+    const summaryData = dataProcessor.calculateSummary(
+      applicationState.accountingRecords,
+    );
+    uiManager.renderSummaryReport(summaryData);
+
+    const originalTitle = document.title;
+    document.title = `${applicationState.selectedFiscalYear}年度_決算報告書`;
+
+    document.body.classList.add("printing-summary");
+    window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+      document.body.classList.remove("printing-summary");
     }, 1000);
   },
 
@@ -383,6 +471,7 @@ const app = {
   renderAccountingTable: () => uiManager.renderAccountingTable(),
   updateTotalsDisplay: () => uiManager.updateTotalsDisplay(),
   handlePrintReport: () => appController.handlePrintReport(),
+  handlePrintSummaryReport: () => appController.handlePrintSummaryReport(),
 };
 
 // アプリケーションの初期化処理を実行
