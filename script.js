@@ -67,6 +67,22 @@ const apiService = {
 //      責務をデータ処理に限定することで、ロジックの単体テストが容易になり、将来的に異なるUIやデータソースで再利用することも可能になります。
 const dataProcessor = {
   INCOME_ITEM_NAMES: ["前年度繰越金", "本年度会費", "資源回収収益", "決算利息"],
+  EXPENSE_ITEM_NAMES: [
+    "備品・消耗品費",
+    "お楽しみ会",
+    "お泊り会おみやげ",
+    "運動会景品",
+    "卒園進級記念品代",
+    "学年末お礼代",
+    "クラス担任アルバム",
+    "慶弔費",
+    "札幌私立幼稚園PTA連合会会費",
+    "日本スポーツ振興センター負担金",
+    "幼稚園寄付金",
+    "用紙・印刷代",
+    "通信費",
+    "予備費",
+  ],
 
   isIncomeItem(itemName) {
     return this.INCOME_ITEM_NAMES.includes(itemName);
@@ -74,12 +90,15 @@ const dataProcessor = {
 
   filterAndSortRecords(records, filterItem, sortOrder) {
     // Why: フィルター条件を複数扱うため、if文で条件を分岐させています。
-    //      "ALL"は全件、"_EXPENSES_ONLY_"は支出のみ、それ以外は項目名での完全一致検索として機能します。
-    //      この特殊な識別子"_EXPENSES_ONLY_"は、UI上の表示とは独立した、ロジック内部でのみ意味を持つ値です。
+    //      "ALL"は全件、"_INCOME_ONLY_"は収入のみ、"_EXPENSES_ONLY_"は支出のみ、それ以外は項目名での完全一致検索として機能します。
+    //      これらの特殊な識別子は、UI上の表示とは独立した、ロジック内部でのみ意味を持つ値です。
     const filteredRecords = records.filter((record) => {
       const itemName = record[2];
       if (filterItem === "ALL") {
         return true;
+      }
+      if (filterItem === "_INCOME_ONLY_") {
+        return this.isIncomeItem(itemName);
       }
       if (filterItem === "_EXPENSES_ONLY_") {
         return !this.isIncomeItem(itemName);
@@ -120,26 +139,27 @@ const dataProcessor = {
   },
 
   calculateSummary(records) {
-    const summary = {
-      income: new Map(),
-      expense: new Map(),
-    };
+    // Why: 決算報告書では全項目を表示する必要があるため、まずマスターリストから全項目を0で初期化したMapを作成します。
+    const incomeMap = new Map();
+    this.INCOME_ITEM_NAMES.forEach((item) => incomeMap.set(item, 0));
+    const expenseMap = new Map();
+    this.EXPENSE_ITEM_NAMES.forEach((item) => expenseMap.set(item, 0));
 
+    // Why: 次に、実際の取引記録をループ処理し、対応する項目の金額を加算していきます。
+    //      この方法により、取引がなかった項目も0円として確実に集計結果に含まれます。
     records.forEach((record) => {
       const [_row, _date, itemName, _details, amountStr] = record;
       const amount = parseFloat(amountStr);
 
-      if (this.isIncomeItem(itemName)) {
-        const currentTotal = summary.income.get(itemName) || 0;
-        summary.income.set(itemName, currentTotal + amount);
-      } else {
-        const currentTotal = summary.expense.get(itemName) || 0;
-        summary.expense.set(itemName, currentTotal + amount);
+      if (incomeMap.has(itemName)) {
+        incomeMap.set(itemName, incomeMap.get(itemName) + amount);
+      } else if (expenseMap.has(itemName)) {
+        expenseMap.set(itemName, expenseMap.get(itemName) + amount);
       }
     });
 
     let totalIncome = 0;
-    const incomeSummary = Array.from(summary.income.entries()).map(
+    const incomeSummary = Array.from(incomeMap.entries()).map(
       ([itemName, totalAmount]) => {
         totalIncome += totalAmount;
         return { itemName, totalAmount };
@@ -147,7 +167,7 @@ const dataProcessor = {
     );
 
     let totalExpense = 0;
-    const expenseSummary = Array.from(summary.expense.entries()).map(
+    const expenseSummary = Array.from(expenseMap.entries()).map(
       ([itemName, totalAmount]) => {
         totalExpense += totalAmount;
         return { itemName, totalAmount };
@@ -319,11 +339,17 @@ const uiManager = {
 
     // 印刷用の合計表示はフィルター条件によって切り替える
     const filterValue = this.domElements.filterItem.value;
+    const isIncomeFilter =
+      filterValue === "_INCOME_ONLY_" ||
+      dataProcessor.INCOME_ITEM_NAMES.includes(filterValue);
 
-    // Why: フィルターが「すべての項目」の場合のみ収入・残高を含めた全情報を表示します。
-    //      それ以外（支出項目での絞り込み時）は、帳票の目的に合わせて支出の合計のみを記載し、情報を簡潔に保ちます。
+    // Why: フィルターの種類に応じて、帳票のヘッダーに表示する合計情報の形式を動的に変更します。
+    //      「すべての項目」では収入・支出・残高の全体像を、「収入のみ」や「支出のみ」のフィルターでは、
+    //      その目的に特化した合計のみを表示することで、帳票の可読性を高めます。
     if (filterValue === "ALL") {
       this.domElements.printTotal.innerText = `選択計 収入: ${totals.incomeTotal.toLocaleString()}円 / 支出: ${totals.expenseTotal.toLocaleString()}円 (残高: ${totals.balance.toLocaleString()}円)`;
+    } else if (isIncomeFilter) {
+      this.domElements.printTotal.innerText = `選択収入合計: ${totals.incomeTotal.toLocaleString()}円`;
     } else {
       this.domElements.printTotal.innerText = `選択支出合計: ${totals.expenseTotal.toLocaleString()}円`;
     }

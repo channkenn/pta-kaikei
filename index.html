@@ -126,7 +126,14 @@
             <label>絞り込んで帳票を作る</label>
             <select id="filter-item" onchange="app.renderAccountingTable()">
               <option value="ALL">すべての項目</option>
+              <option value="_INCOME_ONLY_">収入のすべて</option>
               <option value="_EXPENSES_ONLY_">支出のすべて</option>
+              <optgroup label="収入項目（個別）">
+                <option value="前年度繰越金">前年度繰越金</option>
+                <option value="本年度会費">本年度会費</option>
+                <option value="資源回収収益">資源回収収益</option>
+                <option value="決算利息">決算利息</option>
+              </optgroup>
               <optgroup label="支出項目（個別）">
                 <option value="備品・消耗品費">備品・消耗品費</option>
                 <option value="お楽しみ会">お楽しみ会</option>
