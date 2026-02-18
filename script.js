@@ -66,9 +66,16 @@ const apiService = {
 // Why: このモジュールは、アプリケーションのUI（見た目）や通信方法に一切依存しない、純粋なデータ操作ロジックに特化しています。
 //      責務をデータ処理に限定することで、ロジックの単体テストが容易になり、将来的に異なるUIやデータソースで再利用することも可能になります。
 const dataProcessor = {
-  INCOME_ITEM_NAMES: ["前年度繰越金", "本年度会費", "資源回収収益", "決算利息"],
+  INCOME_ITEM_NAMES: [
+    "前年度繰越金",
+    "本年度会費",
+    "資源回収収益",
+    "決算利息",
+    "その他収入",
+  ],
   EXPENSE_ITEM_NAMES: [
     "備品・消耗品費",
+    "交流会",
     "お楽しみ会",
     "お泊り会おみやげ",
     "運動会景品",
@@ -210,12 +217,16 @@ const uiManager = {
     contentView: document.getElementById("content-view"),
     tabInput: document.getElementById("tab-input"),
     tabView: document.getElementById("tab-view"),
-    summaryPrintTitle: document.getElementById("summary-print-title"),
+    summaryPrintTitleIncome: document.getElementById(
+      "summary-print-title-income",
+    ),
+    summaryPrintTitleExpense: document.getElementById(
+      "summary-print-title-expense",
+    ),
     summaryIncomeBody: document.getElementById("summary-income-body"),
     summaryTotalIncome: document.getElementById("summary-total-income"),
     summaryExpenseBody: document.getElementById("summary-expense-body"),
     summaryTotalExpense: document.getElementById("summary-total-expense"),
-    summaryFinalBalance: document.getElementById("summary-final-balance"),
   },
 
   _createViewRowHtml(record) {
@@ -320,9 +331,10 @@ const uiManager = {
       summaryData.totalIncome.toLocaleString();
     this.domElements.summaryTotalExpense.innerText =
       summaryData.totalExpense.toLocaleString();
-    this.domElements.summaryFinalBalance.innerText =
-      summaryData.finalBalance.toLocaleString();
-    this.domElements.summaryPrintTitle.innerText = `${applicationState.selectedFiscalYear}年度 決算報告書`;
+
+    const titleText = `${applicationState.selectedFiscalYear}年度 決算報告書`;
+    this.domElements.summaryPrintTitleIncome.innerText = titleText;
+    this.domElements.summaryPrintTitleExpense.innerText = titleText;
   },
 
   updateTotalsDisplay() {

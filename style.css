@@ -237,9 +237,8 @@ select {
     text-align: right;
   }
 
-  #summary-print-area .summary-final-balance {
-    text-align: right;
-    margin-top: 20px;
-    font-size: 1.1rem;
+  /* 収入と支出を別ページにする設定 */
+  .summary-expense-section {
+    page-break-before: always;
   }
 }

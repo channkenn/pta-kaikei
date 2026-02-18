@@ -12,7 +12,7 @@
     <meta property="og:title" content="さわらび幼稚園PTA会計管理アプリ" />
     <meta
       property="og:description"
-      content="PTAの収支入力・帳票出力がスマホで簡単に。2025-2030年度対応。"
+      content="PTA의 収支入力・帳票出力がスマホで簡単に。2025-2030年度対応。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://channkenn.github.io/pta-kaikei/" />
@@ -65,12 +65,14 @@
               <option value="">-- 項目を選択 --</option>
               <optgroup label="【収入】">
                 <option value="前年度繰越金">前年度繰越金</option>
-                <option value="本年度会費">本年度会費</option>
+                <option value="本年度会費">本年度會費</option>
                 <option value="資源回収収益">資源回収収益</option>
                 <option value="決算利息">決算利息</option>
+                <option value="その他収入">その他収入</option>
               </optgroup>
               <optgroup label="【支出】">
                 <option value="備品・消耗品費">備品・消耗品費</option>
+                <option value="交流会">交流会</option>
                 <option value="お楽しみ会">お楽しみ会</option>
                 <option value="お泊り会おみやげ">お泊り会おみやげ</option>
                 <option value="運動会景品">運動会景品</option>
@@ -133,9 +135,11 @@
                 <option value="本年度会費">本年度会費</option>
                 <option value="資源回収収益">資源回収収益</option>
                 <option value="決算利息">決算利息</option>
+                <option value="その他収入">その他収入</option>
               </optgroup>
               <optgroup label="支出項目（個別）">
                 <option value="備品・消耗品費">備品・消耗品費</option>
+                <option value="交流会">交流会</option>
                 <option value="お楽しみ会">お楽しみ会</option>
                 <option value="お泊り会おみやげ">お泊り会おみやげ</option>
                 <option value="運動会景品">運動会景品</option>
@@ -183,6 +187,16 @@
             </div>
           </div>
 
+          <button
+            onclick="app.handlePrintSummaryReport()"
+            class="btn-summary-print"
+          >
+            決算報告書を出力
+          </button>
+          <button onclick="app.handlePrintReport()" class="btn-print">
+            A4明細帳票(PDF)を出力
+          </button>
+
           <div class="card no-print">
             <div class="scroll-container">
               <table class="view-table">
@@ -202,16 +216,6 @@
               </table>
             </div>
           </div>
-
-          <button
-            onclick="app.handlePrintSummaryReport()"
-            class="btn-summary-print"
-          >
-            決算報告書を出力
-          </button>
-          <button onclick="app.handlePrintReport()" class="btn-print">
-            A4明細帳票(PDF)を出力
-          </button>
         </div>
       </div>
     </div>
@@ -238,44 +242,44 @@
     </div>
 
     <div id="summary-print-area" class="print-only">
-      <h2 id="summary-print-title"></h2>
+      <div class="summary-income-section">
+        <h2 id="summary-print-title-income"></h2>
+        <h3>《収入の部》</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>金額</th>
+            </tr>
+          </thead>
+          <tbody id="summary-income-body"></tbody>
+          <tfoot>
+            <tr>
+              <td><strong>合計</strong></td>
+              <td id="summary-total-income"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
 
-      <h3>《収入の部》</h3>
-      <table class="summary-table">
-        <thead>
-          <tr>
-            <th>項目</th>
-            <th>金額</th>
-          </tr>
-        </thead>
-        <tbody id="summary-income-body"></tbody>
-        <tfoot>
-          <tr>
-            <td><strong>合計</strong></td>
-            <td id="summary-total-income"></td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <h3>《支出の部》</h3>
-      <table class="summary-table">
-        <thead>
-          <tr>
-            <th>項目</th>
-            <th>金額</th>
-          </tr>
-        </thead>
-        <tbody id="summary-expense-body"></tbody>
-        <tfoot>
-          <tr>
-            <td><strong>合計</strong></td>
-            <td id="summary-total-expense"></td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <div class="summary-final-balance">
-        <h3>差引残高: <span id="summary-final-balance"></span>円</h3>
+      <div class="summary-expense-section">
+        <h2 id="summary-print-title-expense"></h2>
+        <h3>《支出の部》</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>金額</th>
+            </tr>
+          </thead>
+          <tbody id="summary-expense-body"></tbody>
+          <tfoot>
+            <tr>
+              <td><strong>合計</strong></td>
+              <td id="summary-total-expense"></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     </div>
 
