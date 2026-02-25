@@ -75,7 +75,6 @@ const dataProcessor = {
   ],
   EXPENSE_ITEM_NAMES: [
     "備品・消耗品費",
-    "交流会",
     "お楽しみ会",
     "お泊り会おみやげ",
     "運動会景品",
