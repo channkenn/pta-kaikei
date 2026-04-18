@@ -14,6 +14,7 @@ body {
   margin-bottom: 15px;
 }
 
+/* ★スマホ画面で表を横スクロールさせるための枠 */
 .scroll-container {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -57,7 +58,7 @@ select {
 }
 
 .btn-summary-print {
-  background: #2196f3; /* 収支報告書ボタンの色 */
+  background: #2196f3; /* 決算報告書ボタンの色を変更 */
   margin-top: 10px;
 }
 
@@ -71,6 +72,7 @@ select {
   font-size: 0.75rem;
 }
 
+/* タブ */
 .tabs {
   display: flex;
   margin-bottom: 15px;
@@ -89,10 +91,11 @@ select {
   color: white;
 }
 
+/* --- 閲覧用テーブル（スマホ表示用：6列対応） --- */
 .view-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 700px; /* ★6列を並べるために必要な幅を確保 */
 }
 
 .view-table th,
@@ -101,18 +104,22 @@ select {
   border-bottom: 1px solid #eee;
   text-align: left;
   font-size: 0.8rem;
-  white-space: nowrap;
+  white-space: nowrap; /* スマホ画面では勝手に改行させない */
 }
 
+/* 金額列は右寄せで見やすく */
 .view-table td:nth-child(5) {
+  /* 金額列は5番目に変更 */
   text-align: right;
   font-weight: bold;
 }
 
+/* 印刷専用エリア（普段は隠す） */
 .print-only {
   display: none;
 }
 
+/* --- 印刷設定（PDF出力時のみ適用） --- */
 @media print {
   .no-print {
     display: none !important;
@@ -125,6 +132,7 @@ select {
     padding: 0 !important;
   }
 
+  /* 印刷対象に応じて不要なエリアを隠す */
   body.printing-details #summary-print-area {
     display: none !important;
   }
@@ -138,6 +146,7 @@ select {
     padding: 0;
   }
 
+  /* --- 明細帳票のスタイル --- */
   table#report-table {
     width: 100%;
     border-collapse: collapse;
@@ -196,7 +205,7 @@ select {
     page-break-inside: avoid;
   }
 
-  /* --- 収支報告書用のスタイル --- */
+  /* --- 決算報告書用のスタイル --- */
   #summary-print-area h2,
   #summary-print-area h3 {
     text-align: center;
@@ -228,6 +237,7 @@ select {
     text-align: right;
   }
 
+  /* 収入と支出を別ページにする設定 */
   .summary-expense-section {
     page-break-before: always;
   }

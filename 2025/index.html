@@ -12,7 +12,7 @@
     <meta property="og:title" content="さわらび幼稚園PTA会計管理アプリ" />
     <meta
       property="og:description"
-      content="PTAの 収支入力・帳票出力がスマホで簡単に。2025-2030年度対応。"
+      content="PTA의 収支入力・帳票出力がスマホで簡単に。2025-2030年度対応。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://channkenn.github.io/pta-kaikei/" />
@@ -72,7 +72,6 @@
               </optgroup>
               <optgroup label="【支出】">
                 <option value="備品・消耗品費">備品・消耗品費</option>
-                <option value="交流会">交流会</option>
                 <option value="お楽しみ会">お楽しみ会</option>
                 <option value="お泊り会おみやげ">お泊り会おみやげ</option>
                 <option value="運動会景品">運動会景品</option>
@@ -139,7 +138,6 @@
               </optgroup>
               <optgroup label="支出項目（個別）">
                 <option value="備品・消耗品費">備品・消耗品費</option>
-                <option value="交流会">交流会</option>
                 <option value="お楽しみ会">お楽しみ会</option>
                 <option value="お泊り会おみやげ">お泊り会おみやげ</option>
                 <option value="運動会景品">運動会景品</option>
@@ -162,10 +160,8 @@
 
             <label>日付の並び替え</label>
             <select id="sort-order" onchange="app.renderAccountingTable()">
-              <option value="desc" selected>
-                新しい順（最近の入力を上に）
-              </option>
-              <option value="asc">古い順（日付順に並べる）</option>
+              <option value="asc" selected>古い順（日付順に並べる）</option>
+              <option value="desc">新しい順（最近の入力を上に）</option>
             </select>
 
             <div

@@ -2,283 +2,76 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>PTA会計アプリ</title>
-    <link rel="stylesheet" href="style.css" />
-
-    <meta property="og:title" content="さわらび幼稚園PTA会計管理アプリ" />
-    <meta
-      property="og:description"
-      content="PTA의 収支入力・帳票出力がスマホで簡単に。2025-2030年度対応。"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://channkenn.github.io/pta-kaikei/" />
-    <meta
-      property="og:image"
-      content="https://channkenn.github.io/pta-kaikei/ogp-image.png"
-    />
-    <meta property="og:site_name" content="さわらび幼稚園PTA会計管理" />
-    <meta property="og:locale" content="ja_JP" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PTA会計管理アプリ | ポータル</title>
+    <!-- <meta http-equiv="refresh" content="0;URL='./2026/'" /> -->
+    <style>
+      body {
+        font-family: sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f7f6;
+        color: #333;
+        text-align: center;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 90%;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+      }
+      .btn {
+        display: block;
+        text-decoration: none;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: opacity 0.2s;
+      }
+      .btn-main {
+        background-color: #4caf50;
+        color: white;
+      }
+      .btn-sub {
+        background-color: #ddd;
+        color: #333;
+        font-size: 0.9rem;
+      }
+      .btn:hover {
+        opacity: 0.8;
+      }
+      .loading-text {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 20px;
+      }
+    </style>
   </head>
   <body>
-    <div class="no-print">
-      <div id="login-screen" class="screen">
-        <div class="card">
-          <h1>PTA会計管理</h1>
-          <label>対象年度</label>
-          <select id="select-year">
-            <option value="2025" selected>2025年度</option>
-            <option value="2026">2026年度</option>
-          </select>
-          <label>合言葉</label>
-          <input type="password" id="passcode" placeholder="合言葉を入力" />
-          <button onclick="app.handleLogin()" class="btn-primary">
-            利用開始
-          </button>
-        </div>
-      </div>
+    <div class="container">
+      <h1>PTA会計管理アプリ</h1>
 
-      <div id="main-screen" class="screen" style="display: none">
-        <div class="tabs">
-          <button
-            onclick="app.switchTab('input')"
-            id="tab-input"
-            class="active"
-          >
-            書き込み
-          </button>
-          <button onclick="app.switchTab('view')" id="tab-view">
-            閲覧・帳票出力
-          </button>
-        </div>
+      <a href="./2026/" class="btn btn-main">2026年度以降（本番版）へ</a>
+      <a href="./2025/" class="btn btn-sub">2025年度（ベータ版）を参照</a>
 
-        <div id="content-input">
-          <div class="card">
-            <h2 id="display-year"></h2>
-            <label>日付</label>
-            <input type="date" id="input-date" />
-            <label>項目</label>
-            <select id="input-item">
-              <option value="">-- 項目を選択 --</option>
-              <optgroup label="【収入】">
-                <option value="前年度繰越金">前年度繰越金</option>
-                <option value="本年度会費">本年度會費</option>
-                <option value="資源回収収益">資源回収収益</option>
-                <option value="決算利息">決算利息</option>
-                <option value="その他収入">その他収入</option>
-              </optgroup>
-              <optgroup label="【支出】">
-                <option value="備品・消耗品費">備品・消耗品費</option>
-                <option value="お楽しみ会">お楽しみ会</option>
-                <option value="お泊り会おみやげ">お泊り会おみやげ</option>
-                <option value="運動会景品">運動会景品</option>
-                <option value="卒園進級記念品代">卒園進級記念品代</option>
-                <option value="学年末お礼代">学年末お礼代</option>
-                <option value="クラス担任アルバム">クラス担任アルバム</option>
-                <option value="慶弔費">慶弔費</option>
-                <option value="札幌私立幼稚園PTA連合会会費">
-                  札幌私立幼稚園PTA連合会会費
-                </option>
-                <option value="日本スポーツ振興センター負担金">
-                  日本スポーツ振興センター負担金
-                </option>
-                <option value="幼稚園寄付金">幼稚園寄付金</option>
-                <option value="用紙・印刷代">用紙・印刷代</option>
-                <option value="通信費">通信費</option>
-                <option value="予備費">予備費</option>
-              </optgroup>
-            </select>
-            <label>内訳（具体的な内容）</label>
-            <input
-              type="text"
-              id="input-details"
-              placeholder="例：封筒、お菓子など"
-            />
-            <label>金額</label>
-            <input
-              type="number"
-              id="input-amount"
-              inputmode="numeric"
-              placeholder="0"
-            />
-            <label>支払先</label>
-            <input
-              type="text"
-              id="input-payee"
-              placeholder="例：領収証参照、〇〇商店"
-            />
-            <label>備考（予備）</label>
-            <input type="text" id="input-memo" />
-            <button
-              id="btn-save"
-              onclick="app.handleSaveNewRecord()"
-              class="btn-save"
-            >
-              保存する
-            </button>
-          </div>
-        </div>
-
-        <div id="content-view" style="display: none">
-          <div class="card">
-            <label>絞り込んで帳票を作る</label>
-            <select id="filter-item" onchange="app.renderAccountingTable()">
-              <option value="ALL">すべての項目</option>
-              <option value="_INCOME_ONLY_">収入のすべて</option>
-              <option value="_EXPENSES_ONLY_">支出のすべて</option>
-              <optgroup label="収入項目（個別）">
-                <option value="前年度繰越金">前年度繰越金</option>
-                <option value="本年度会費">本年度会費</option>
-                <option value="資源回収収益">資源回収収益</option>
-                <option value="決算利息">決算利息</option>
-                <option value="その他収入">その他収入</option>
-              </optgroup>
-              <optgroup label="支出項目（個別）">
-                <option value="備品・消耗品費">備品・消耗品費</option>
-                <option value="お楽しみ会">お楽しみ会</option>
-                <option value="お泊り会おみやげ">お泊り会おみやげ</option>
-                <option value="運動会景品">運動会景品</option>
-                <option value="卒園進級記念品代">卒園進級記念品代</option>
-                <option value="学年末お礼代">学年末お礼代</option>
-                <option value="クラス担任アルバム">クラス担任アルバム</option>
-                <option value="慶弔費">慶弔費</option>
-                <option value="札幌私立幼稚園PTA連合会会費">
-                  札幌私立幼稚園PTA連合会会費
-                </option>
-                <option value="日本スポーツ振興センター負担金">
-                  日本スポーツ振興センター負担金
-                </option>
-                <option value="幼稚園寄付金">幼稚園寄付金</option>
-                <option value="用紙・印刷代">用紙・印刷代</option>
-                <option value="通信費">通信費</option>
-                <option value="予備費">予備費</option>
-              </optgroup>
-            </select>
-
-            <label>日付の並び替え</label>
-            <select id="sort-order" onchange="app.renderAccountingTable()">
-              <option value="asc" selected>古い順（日付順に並べる）</option>
-              <option value="desc">新しい順（最近の入力を上に）</option>
-            </select>
-
-            <div
-              style="
-                margin-top: 15px;
-                font-weight: bold;
-                text-align: right;
-                font-size: 1.1rem;
-                line-height: 1.6;
-              "
-            >
-              <div>収入合計: <span id="view-total-income">0</span>円</div>
-              <div>支出合計: <span id="view-total-expense">0</span>円</div>
-              <div
-                style="border-top: 1px solid #ccc; margin-top: 5px; color: #333"
-              >
-                残高: <span id="view-total-balance">0</span>円
-              </div>
-            </div>
-          </div>
-
-          <button
-            onclick="app.handlePrintSummaryReport()"
-            class="btn-summary-print"
-          >
-            収支報告書を出力
-          </button>
-          <button onclick="app.handlePrintReport()" class="btn-print">
-            A4明細帳票(PDF)を出力
-          </button>
-
-          <div class="card no-print">
-            <div class="scroll-container">
-              <table class="view-table">
-                <thead>
-                  <tr>
-                    <th>選</th>
-                    <th>日付</th>
-                    <th>項目</th>
-                    <th>内訳</th>
-                    <th>金額</th>
-                    <th>支払先</th>
-                    <th>備考</th>
-                    <th>消</th>
-                  </tr>
-                </thead>
-                <tbody id="view-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+      <p class="loading-text">最新年度へ移動しています...</p>
     </div>
 
-    <div id="print-area" class="print-only">
-      <div class="print-header">
-        <div>【明細】：<span id="print-title-item"></span></div>
-        <div><span id="print-total"></span></div>
-      </div>
-      <table id="report-table">
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>項目</th>
-            <th>内訳</th>
-            <th>金額(円)</th>
-            <th>支払先</th>
-            <th>備考</th>
-          </tr>
-        </thead>
-        <tbody id="report-body"></tbody>
-      </table>
-      <div class="receipt-box">領収証貼り付け</div>
-    </div>
-
-    <div id="summary-print-area" class="print-only">
-      <div class="summary-income-section">
-        <h2 id="summary-print-title-income"></h2>
-        <h3>《収入の部》</h3>
-        <table class="summary-table">
-          <thead>
-            <tr>
-              <th>項目</th>
-              <th>金額</th>
-            </tr>
-          </thead>
-          <tbody id="summary-income-body"></tbody>
-          <tfoot>
-            <tr>
-              <td><strong>合計</strong></td>
-              <td id="summary-total-income"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="summary-expense-section">
-        <h2 id="summary-print-title-expense"></h2>
-        <h3>《支出の部》</h3>
-        <table class="summary-table">
-          <thead>
-            <tr>
-              <th>項目</th>
-              <th>金額</th>
-            </tr>
-          </thead>
-          <tbody id="summary-expense-body"></tbody>
-          <tfoot>
-            <tr>
-              <td><strong>合計</strong></td>
-              <td id="summary-total-expense"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-
-    <script src="script.js"></script>
+    <!-- <script>
+      // JavaScriptによる補完的な転送
+      setTimeout(function () {
+        window.location.href = "./2026/";
+      }, 500);
+    </script> -->
   </body>
 </html>
